@@ -45,7 +45,8 @@
 			"facebook" => array("facebook"),
 			"palestina" => array("palestina"),
 			"serie trotsky" => array("serie tr", "serie do tr", "serie sobre tr"),
-			"formacao" => array("formacao", "formação", "clássicos", "classico", "estudar", "estudo")
+			"formacao" => array("formacao", "formação", "clássicos", "classico", "estudar", "estudo"),
+			"orientacao" => array("orientacao marxita", "orientação marxista", "canal do gustavo")
 		);
 		foreach ($key_words as $normalized_word => $possible_words) {
 			foreach ($possible_words as $word){
@@ -85,7 +86,10 @@
 			    "Aqui está a nossa série sobre Trotksy: https://youtube.com/playlist?list=PLJDALdfR0xX14NVlOncjLC5hhMMcoTjEB"
 			),
 			"formacao" => array(
-			    "Você pode acessar todos nossos cursos e materiais de formação aqui nesse link: https://bit.ly/3emDO0e"    
+			    "Você pode acessar todos nossos cursos e materiais de formação aqui nesse link: https://bit.ly/3emDO0e"
+			),
+			"orientacao" => array(
+			    "Ei, aqui vai o link para o canal do Orientação Marxista ( @orient_marxista ).\nhttps://www.youtube.com/channel/UCRLEkZpNRoZQBG8kUTBD8vQ \n\nAproveita e segue ele também!"
 			)
 		);
 		$statement = array_rand($phrases[$keyword]);
