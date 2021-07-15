@@ -95,21 +95,27 @@
 	
 	function find_first_command($tweet){
 		$tweet = normalize_tweet($tweet);
-		$commands = array("#pesquisa");
-		foreach ($commands as $comm){
-			$pos = strpos($tweet, $comm);
-			if ($pos !== false) {
-				$param = substr($tweet,$pos+strlen($param)); //seleciona todo o texto que está depois do comando
-				return array("command" => $comm, "param" => $param);
+		$key_commands = array(
+			"#pesquisa" => array("#pesquisa", "pensa sobre", "defende sobre", "posicao sobre", "posicao do pstu sobre")
+		);
+		foreach ($key_commands as $normalized_command => $possible_commands){
+			foreach($possible_commands as $command){
+				$pos = strpos($tweet, $command);
+				if ($pos !== false) {
+					$param = substr($tweet,$pos+strlen($command)); //seleciona apenas o texto que está depois do comando
+					$param = str_replace(array("?","!",",",";","."), "", $param); //remove pontuação
+					$param = trim($param); //remove espaços
+					return array("command" => $normalized_command, "param" => $param);
+				}
 			}
 		}
 		return NULL;
 	}
 	
 	function command_phrase($arr_command){
-		switch ($arr_command->command) {
+		switch ($arr_command["command"]) {
 			case "#pesquisa":
-				return "Oi! Encontrei essas matérias aqui no site: https://www.pstu.org.br/?s=" . rawurlencode($arr_command->param);
+				return "Oi! Encontrei essas matérias aqui no site: https://www.pstu.org.br/?s=" . rawurlencode($arr_command["param"]);
 		}		
 	}
 	
