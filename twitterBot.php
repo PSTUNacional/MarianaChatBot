@@ -28,12 +28,20 @@
 	$lista = json_decode($response);
 	
 	/*---------- FUNÇÕES INTERPRETATIVAS - Busca no texto palavras-chave para condicionar a resposta  ----------*/
+    function stripAccents($str) {
+        return strtr(utf8_decode($str), utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
+    }
+	
 	function find_first_key_word($tweet) {
-	    $tweet = strtolower($tweet);
+	    $tweet = stripAccents(mb_strtolower($tweet, 'UTF-8'));
 		$key_words = array(
-			"jornal" => array("jornal", "opinião socialista"),
-			"filiar" => array("filiar", "filia", "filiação"),
-			"whatsapp" => array("whatsapp", "zap")
+			"jornal" => array("jornal", "jornais", "opinião socialista", "opiniao socialista"),
+			"filiar" => array("filiar", "filia", "filiação", "filie"),
+			"whatsapp" => array("whatsapp", "zap", "whats"),
+			"facebook" => array("facebook"),
+			"palestina" => array("palestina"),
+			"serie trotsky" => array("serie tr", "serie do tr", "serie sobre tr"),
+			"formacao" => array("formacao", "formação", "clássicos", "classico", "estudar", "estudo")
 		);
 		foreach ($key_words as $normalized_word => $possible_words) {
 			foreach ($possible_words as $word){
@@ -56,16 +64,28 @@
 				"Acredita que eu estava agora mesmo dando uma olhada no jornal? Aqui estão as últimas edições https://pstu.org.br/opiniaosocialista/"
 			),
 			"filiar" => array(
-				"Que demais! Fico muito feliz por você querer se filiar! Preenche seu cadastro nesse link, é rapidinho! Em breve alguém entrará em contato para terminar o processo. https://facaparte.pstu.org.br",
-				"AAAAaaaaahhh fico feliz que você está se filiando! Olha, só faz o cadastro nesse link e em breve alguém entrará em contato! https://facaparte.pstu.org.br",
-				"Meeee pareceee. Meeee pareceee. Meeee pareceee. Que o socialismo cresce. Faz o cadastro nesse link que eu to te mandando, e alguém entra em contato com você em breve! https://facaparte.pstu.org.br"
+				"Que demais! Fico muito feliz por você querer se filiar! Preenche seu cadastro nesse link, é rapidinho! Em breve alguém entrará em contato para terminar o processo. https://bit.ly/36AXid2",
+				"AAAAaaaaahhh fico feliz que você quer se filiar! Olha, só faz o cadastro nesse link e em breve alguém entrará em contato! https://bit.ly/36AXid2",
+				"Meeee pareceee. Meeee pareceee. Meeee pareceee. Que o socialismo cresce. Faz o cadastro nesse link que eu to te mandando, e alguém entra em contato com você em breve! https://bit.ly/36AXid2"
 			),
 			"whatsapp" => array(
-				"Em breve, ainda estou testando"
+				"Oi! Para se inscrever na nossa lista é só mandar um RECEBER para\n\n(11) 9.4101-1917\n\nVocê também pode clicar aqui https://bit.ly/3wGeetd .\nNão se esqueça de salvar nosso número na sua agenda. =)"
+			),
+			"facebook" => array(
+				"Oi! Aproveita para seguir a gente também no Facebook! Só acessar aqui: https://www.facebook.com/pstu16"
+			),
+			"palestina" => array(
+				"Oi! Encontrei essas matérias aqui sobre Palestina no nosso site: https://www.pstu.org.br/palestina/"
+			),
+			"serie trotsky" => array(
+			    "Aqui está a nossa série sobre Trotksy: https://youtube.com/playlist?list=PLJDALdfR0xX14NVlOncjLC5hhMMcoTjEB"
+			),
+			"formacao" => array(
+			    "Você pode acessar todos nossos cursos e materiais de formação aqui nesse link: https://bit.ly/3emDO0e"    
 			)
 		);
 		$statement = array_rand($phrases[$keyword]);
-		return $phrases[$keyword][$statement];
+		return quoted_printable_decode($phrases[$keyword][$statement]);;
 	}
 	
 	/*---------- LOOPING - Responde os tweets ----------*/
