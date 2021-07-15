@@ -28,12 +28,16 @@
 	$lista = json_decode($response);
 	
 	/*---------- FUNÇÕES INTERPRETATIVAS - Busca no texto palavras-chave para condicionar a resposta  ----------*/
-    function stripAccents($str) {
-        return strtr(utf8_decode($str), utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
-    }
+	function stripAccents($str) {
+		return strtr(utf8_decode($str), utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
+	}
+	
+	function normalize_tweet($tweet){
+		return stripAccents(mb_strtolower($tweet, 'UTF-8'));
+	}
 	
 	function find_first_key_word($tweet) {
-	    $tweet = stripAccents(mb_strtolower($tweet, 'UTF-8'));
+		$tweet = normalize_tweet($tweet);
 		$key_words = array(
 			"jornal" => array("jornal", "jornais", "opinião socialista", "opiniao socialista"),
 			"filiar" => array("filiar", "filia", "filiação", "filie"),
@@ -88,6 +92,36 @@
 		return quoted_printable_decode($phrases[$keyword][$statement]);;
 	}
 	
+	
+	function find_first_command($tweet){
+		$tweet = normalize_tweet($tweet);
+		$commands = array("#pesquisa");
+		foreach ($commands as $comm){
+			$pos = strpos($tweet, $comm);
+			if ($pos !== false) {
+				$param = substr($tweet,$pos+strlen($param)); //seleciona todo o texto que está depois do comando
+				return array("command" => $comm, "param" => $param);
+			}
+		}
+		return NULL;
+	}
+	
+	function command_phrase($arr_command){
+		switch ($arr_command->command) {
+			case "#pesquisa":
+				return "Oi! Encontrei essas matérias aqui no site: https://www.pstu.org.br/?s=" . rawurlencode($arr_command->param);
+		}		
+	}
+	
+	function choose_function($tweet){
+		$arr_command = find_first_command($tweet);
+		if(!is_null($arr_command)){
+			return command_phrase($arr_command);
+		}else{
+			return key_word_phrase(find_first_key_word($tweet));
+		}
+	}
+	
 	/*---------- LOOPING - Responde os tweets ----------*/
 	foreach ($lista as $id_t){
 		$id = $id_t->id;
@@ -95,7 +129,7 @@
 		$urlAnswer = 'https://api.twitter.com/1.1/statuses/update.json';
 		$requestMethod = 'POST';
 		$apiId = array(
-			'status' => key_word_phrase(find_first_key_word($tweet)),
+			'status' => choose_function($tweet),
 			'auto_populate_reply_metadata' => 'true',
 			'in_reply_to_status_id' => $id,
 		);
