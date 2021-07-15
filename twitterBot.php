@@ -29,9 +29,11 @@
 	
 	/*---------- FUNÇÕES INTERPRETATIVAS - Busca no texto palavras-chave para condicionar a resposta  ----------*/
 	function find_first_key_word($tweet) {
+	    $tweet = strtolower($tweet);
 		$key_words = array(
 			"jornal" => array("jornal", "opinião socialista"),
-			"filiar" => array("filiar", "filia", "filiação")
+			"filiar" => array("filiar", "filia", "filiação"),
+			"whatsapp" => array("whatsapp", "zap")
 		);
 		foreach ($key_words as $normalized_word => $possible_words) {
 			foreach ($possible_words as $word){
@@ -57,6 +59,9 @@
 				"Que demais! Fico muito feliz por você querer se filiar! Preenche seu cadastro nesse link, é rapidinho! Em breve alguém entrará em contato para terminar o processo. https://facaparte.pstu.org.br",
 				"AAAAaaaaahhh fico feliz que você está se filiando! Olha, só faz o cadastro nesse link e em breve alguém entrará em contato! https://facaparte.pstu.org.br",
 				"Meeee pareceee. Meeee pareceee. Meeee pareceee. Que o socialismo cresce. Faz o cadastro nesse link que eu to te mandando, e alguém entra em contato com você em breve! https://facaparte.pstu.org.br"
+			),
+			"whatsapp" => array(
+				"Em breve, ainda estou testando"
 			)
 		);
 		$statement = array_rand($phrases[$keyword]);
@@ -78,6 +83,8 @@
 		$twitter->setPostfields($apiId);
 		$twitter->buildOauth($urlAnswer, $requestMethod);
 		$response = $twitter->performRequest(true, array (CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_SSL_VERIFYPEER => 0));
+		
+		echo 'Este túite '.$id.' foi respondido. <br/>';
 	}
 	
 	/*---------- REGISTRA LAST_ID - Salva o ID do último tweet respondido. Ele será o ponto de início do próximo ciclo ----------*/
