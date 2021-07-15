@@ -22,14 +22,15 @@
 	$requestMethod = 'GET';
 	$apiData = '?since_id='.$last_id;
 	$twitter = new TwitterAPIExchange( $settings );
-	$twitter->buildOauth($url, $requestMethod);
+	$twitter->setGetfield( $apiData );   
+	$twitter->buildOauth( $url, $requestMethod );
 	$response = $twitter->performRequest(true, array (CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_SSL_VERIFYPEER => 0));
 	$lista = json_decode($response);
 	
 	/*---------- FUNÇÕES INTERPRETATIVAS - Busca no texto palavras-chave para condicionar a resposta  ----------*/
 	function find_first_key_word($tweet) {
 		$key_words = array(
-			"jornal" => array("jornal"),
+			"jornal" => array("jornal", "opinião socialista"),
 			"filiar" => array("filiar", "filia", "filiação")
 		);
 		foreach ($key_words as $normalized_word => $possible_words) {
@@ -80,7 +81,8 @@
 	}
 	
 	/*---------- REGISTRA LAST_ID - Salva o ID do último tweet respondido. Ele será o ponto de início do próximo ciclo ----------*/
-	$fp = fopen('last_id.txt', 'w');
-	//fwrite($fp, $lista[0]->id); //esse código pega o primeiro twitte respondido, não o último.
-	fwrite($fp, end($lista)->id);
-	fclose($fp);
+	if($lista[0]->id !== NULL){	
+		$fp = fopen('last_id.txt', 'w');
+		fwrite ($fp, $lista[0]->id);
+		fclose($fp);
+	}
