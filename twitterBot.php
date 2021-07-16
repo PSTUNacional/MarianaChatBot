@@ -2,7 +2,7 @@
 	require_once( 'config.php' );
 	require_once( 'TwitterAPIExchange.php' );
 	
-	/*---------- MONTA A CONEXÃO COM A API ----------*/
+	/*---------- Funções de comando do twitter ----------*/
 	$settings = array(
 		'oauth_access_token' => TWITTER_ACCESS_TOKEN, 
 		'oauth_access_token_secret' => TWITTER_ACCESS_TOKEN_SECRET, 
@@ -10,23 +10,64 @@
 		'consumer_secret' => TWITTER_CONSUMER_SECRET,
 	);
 	
-	/*---------- Verifica o último id ----------*/
-	$file = fopen("last_id.txt", "r");
-        while(! feof($file)) {
-        	$last_id = fgets($file);
-    	}
-	fclose($file);
+	function last_mentions($last_id){
+		$url = 'https://api.twitter.com/1.1/statuses/mentions_timeline.json';
+		$requestMethod = 'GET';
+		$apiData = '?since_id='.$last_id;
+		$twitter = new TwitterAPIExchange( $settings );
+		$twitter->setGetfield( $apiData );   
+		$twitter->buildOauth( $url, $requestMethod );
+		$response = $twitter->performRequest(true, array (CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_SSL_VERIFYPEER => 0));
+		$lista = json_decode($response);
+		return $lista;
+	}
 	
-	/*---------- PUXA AS ÚLTIMAS MENÇÕEs AO BOT ----------*/
-	$url = 'https://api.twitter.com/1.1/statuses/mentions_timeline.json';
-	$requestMethod = 'GET';
-	$apiData = '?since_id='.$last_id;
-	$twitter = new TwitterAPIExchange( $settings );
-	$twitter->setGetfield( $apiData );   
-	$twitter->buildOauth( $url, $requestMethod );
-	$response = $twitter->performRequest(true, array (CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_SSL_VERIFYPEER => 0));
-	$lista = json_decode($response);
+	function send_response($tweet_id, $response_phrase){
+		send_to_twitter_API(
+			'https://api.twitter.com/1.1/statuses/update.json',
+			'POST',
+			array(
+				'status' => $response_phrase,
+				'auto_populate_reply_metadata' => 'true',
+				'in_reply_to_status_id' => $tweet_id,
+			)
+		);
+	}
 	
+	function send_like($tweet_id){
+		send_to_twitter_API(
+			'https://api.twitter.com/1.1/favorites/create.json',
+			'POST',
+			array(
+				'id' => $tweet_id,
+			)
+		);
+	}
+	
+	function send_to_twitter_API($url, $requestMethod, $apiData){
+		$twitter = new TwitterAPIExchange($settings);
+		$twitter->setPostfields($apiData);
+		$twitter->buildOauth($urlAnswer, $requestMethod);
+		$response = $twitter->performRequest(true, array (CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_SSL_VERIFYPEER => 0));
+	}
+	
+	/*---------- Funções de registro ----------*/
+	function get_last_id(){
+		$file = fopen("last_id.txt", "r");
+		while(! feof($file)) {
+			$last_id = fgets($file);
+		}
+		fclose($file);
+	}
+	
+	function set_last_id($last_id){
+		if($last_id !== NULL){	
+			$fp = fopen('last_id.txt', 'w');
+			fwrite ($fp, $last_id);
+			fclose($fp);
+		}
+	}
+
 	/*---------- FUNÇÕES INTERPRETATIVAS - Busca no texto palavras-chave para condicionar a resposta  ----------*/
 	function stripAccents($str) {
 		return strtr(utf8_decode($str), utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
@@ -86,9 +127,6 @@
 	}
 	
 	function command_phrase($arr_command){
-		if(is_null($arr_command)){
-			return "Oi! Me chamou? Não consigo responder agora. Eu e os programadores ainda estamos trabalhando nisso. Aproveite para dar uma olhada no nosso site https://pstu.org.br";
-		}
 		switch ($arr_command["command"]) {
 			case "#pesquisa":
 				return "Oi! Encontrei essas matérias aqui no site: https://www.pstu.org.br/?s=" . normalize_url_param_value($arr_command["param"]);
@@ -137,28 +175,22 @@
 		}
 	}
 	
-	/*---------- LOOPING - Responde os tweets ----------*/
-	foreach ($lista as $id_t){
-		$id = $id_t->id;
-		$tweet = $id_t->text;
-		$urlAnswer = 'https://api.twitter.com/1.1/statuses/update.json';
-		$requestMethod = 'POST';
-		$apiId = array(
-			'status' => command_phrase(find_first_command($tweet)),
-			'auto_populate_reply_metadata' => 'true',
-			'in_reply_to_status_id' => $id,
-		);
-		$twitter = new TwitterAPIExchange( $settings );
-		$twitter->setPostfields($apiId);
-		$twitter->buildOauth($urlAnswer, $requestMethod);
-		$response = $twitter->performRequest(true, array (CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_SSL_VERIFYPEER => 0));
-		
-		echo 'Este túite '.$id.' foi respondido. <br/>';
+	function define_action_on_twitter($tweet_id, $twitter_phrase){
+		$arr_command = find_first_command($tweet_phrase);
+		if(is_null($arr_command)){return send_like($tweet_id);} //sem comandos, apenas dar like
+		//apenas temos comandos de responder por enquanto
+		send_response($tweet_id, command_phrase($arr_command));
 	}
 	
-	/*---------- REGISTRA LAST_ID - Salva o ID do último tweet respondido. Ele será o ponto de início do próximo ciclo ----------*/
-	if($lista[0]->id !== NULL){	
-		$fp = fopen('last_id.txt', 'w');
-		fwrite ($fp, $lista[0]->id);
-		fclose($fp);
+	/*---------- LOOPING - Responde os tweets ----------*/
+	$lista[0]->id
+	$tweet_list = last_mentions(get_last_id());
+	$last_id = 0;
+	foreach ($tweet_list as $tweet){
+		$tweet_id = $tweet->id;
+		$last_id = $tweet_id; //redefine $last_id a cada iteração para que o valor final seja o do último
+		$tweet_phrase = $tweet->text;
+		define_action_on_twitter($tweet_id, $tweet_phrase);
+		echo 'Este túite '.$id.' foi respondido. <br/>'; //precisa disso?
 	}
+	set_last_id($last_id);
