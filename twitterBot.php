@@ -94,11 +94,11 @@
 				return "Oi! Encontrei essas matérias aqui no site: https://www.pstu.org.br/?s=" . normalize_url_param_value($arr_command["param"]);
 			case "#editorial":
 				$response = json_decode(file_get_contents('https://www.pstu.org.br/wp-json/wp/v2/posts?categories=5069&per_page=1'));
-				$link = $response[0]["link"];
+				$link = $response[0]->link;
 				return "Oi! Esse é o último editorial que o partido está utilizando para intervenção nas lutas " . $link;
 			case "#jornal":
 				$response = json_decode(file_get_contents('https://www.pstu.org.br/wp-json/wp/v2/posts?categories=6090&per_page=1'));
-				$link = $response[0]["link"];
+				$link = $response[0]->link;
 				return "Oi! Esse é o último jornal Opinião Socialista " . $link;
 			case "#filiar":
 				return choose_phrase(array(
@@ -132,7 +132,7 @@
 				));
 			case "#socialismo":
 				return choose_phrase(array(
-					"Eu sou socialista!\nEsse capitalismo já está podre, né... Está destruindo o planeta e a humanidade. Se quiser entender melhor porque defendemos o socialismo, dá uma olhada nesse texto aqui"."https://www.pstu.org.br/para-mudar-o-mundo-e-necessario-lutar-pelo-socialismo/"
+					"Eu sou socialista!\nEsse capitalismo já está podre, né... Está destruindo o planeta e a humanidade. Se quiser entender melhor porque defendemos o socialismo, dá uma olhada nesse texto aqui https://www.pstu.org.br/para-mudar-o-mundo-e-necessario-lutar-pelo-socialismo/"
 				));
 		}
 	}
