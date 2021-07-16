@@ -32,6 +32,21 @@
 		return strtr(utf8_decode($str), utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
 	}
 	
+	function trim_articles($phrase){
+		$articles = array("o", "os", "a", "as");
+		$phrase_words = explode(" ",$phrase);
+		$new_phrase = implode(array_diff($phrase_words, $articles);
+		return $new_phrase;
+	}
+	
+	function trim_punctuation($phrase){
+		return str_replace(array("?","!",",",";","."), "", $phrase);
+	}
+	
+	function normalize_url_param_value($value){
+		return rawurlencode(trim_punctuation(trim_articles($value)));
+	}
+	
 	function normalize_tweet($tweet){
 		return stripAccents(mb_strtolower($tweet, 'UTF-8'));
 	}
@@ -60,7 +75,7 @@
 				$pos = strpos($tweet, $command);
 				if ($pos !== false) {
 					$param = substr($tweet,$pos+strlen($command)); //seleciona apenas o texto que está depois do comando
-					$param = str_replace(array("?","!",",",";","."), "", $param); //remove pontuação
+					$param = trim_punctuation($param);
 					$param = trim($param); //remove espaços
 					return array("command" => $normalized_command, "param" => $param);
 				}
@@ -75,7 +90,7 @@
 		}
 		switch ($arr_command["command"]) {
 			case "#pesquisa":
-				return "Oi! Encontrei essas matérias aqui no site: https://www.pstu.org.br/?s=" . rawurlencode($arr_command["param"]);
+				return "Oi! Encontrei essas matérias aqui no site: https://www.pstu.org.br/?s=" . normalize_url_param_value($arr_command["param"]);
 			case "#editorial":
 				$response = json_decode(file_get_contents('https://www.pstu.org.br/wp-json/wp/v2/posts?categories=5069&per_page=1'));
 				$link = $response[0]["link"];
