@@ -3,6 +3,7 @@
 	require_once( 'TwitterAPIExchange.php' );
 	
 	/*---------- Funções de comando do twitter ----------*/
+	$friends = [];
 	$settings = array(
 		'oauth_access_token' => TWITTER_ACCESS_TOKEN, 
 		'oauth_access_token_secret' => TWITTER_ACCESS_TOKEN_SECRET, 
@@ -19,6 +20,16 @@
 		return $lista;
 	}
 	
+	function get_friends(){
+		$url = 'https://api.twitter.com/1.1/friends/ids.json';
+		$requestMethod = 'GET';
+		$apiData = "";
+		$response = send_to_twitter_API($url, $requestMethod, $apiData);
+		$lista = json_decode($response);
+		global $friends;
+		$friends = $lista->ids;
+	}
+	
 	function send_response($tweet_id, $response_phrase){
 		send_to_twitter_API(
 			'https://api.twitter.com/1.1/statuses/update.json',
@@ -28,6 +39,14 @@
 				'auto_populate_reply_metadata' => 'true',
 				'in_reply_to_status_id' => $tweet_id,
 			)
+		);
+	}
+
+	function send_retweet($tweet_id, $response_phrase){
+		send_to_twitter_API(
+			'https://api.twitter.com/1.1/statuses/retweet/'.$tweet_id.'.json',
+			'POST',
+			array()
 		);
 	}
 	
@@ -107,6 +126,9 @@
 	function find_first_command($tweet){
 		$tweet = normalize_tweet($tweet);
 		$key_commands = array(
+			"#denuncia" => array("#denuncia"),
+			"#urgente" => array("#urgente"),
+			"#liberdade" => array("#liberdade"),
 			"#editorial" => array("#editorial", "editorial"),
 			"#jornal" => array("#jornal", "jornal", "opiniao socialista", "opinião socialista"),
 			"#filiar" => array("#filiar", "filiar", "filia", "filiação", "filie"),
@@ -182,11 +204,22 @@
 		}
 	}
 	
-	function define_action_on_twitter($tweet_id, $tweet_phrase){
+	function define_action_on_twitter($tweet_id, $tweet_phrase, $tweet_author_id){
 		$arr_command = find_first_command($tweet_phrase);
 		if(is_null($arr_command)){return send_like($tweet_id);} //sem comandos, apenas dar like
-		//apenas temos comandos de responder por enquanto
-		send_response($tweet_id, command_phrase($arr_command));
+		
+		$commands_to_retwitte = array("#denuncia", "#urgente", "#liberdade");
+		if (in_array($arr_command["command"], $commands_to_retwitte)) { //verifica se é um comando retweet 
+			global $friends;
+			if($friends == []){get_friends();} //verifica se a lista de amigos está vazia, se tiver, cria.
+			if(in_array($tweet_author_id, $friends)){ //verifica se esse twitte está na lista de amigos
+				return send_retweet($tweet_id, $response_phrase); //se tiver, retwitta
+			}else{
+				return send_like($tweet_id); //se não tiver, apenas dá like
+			}
+		}else{
+			send_response($tweet_id, command_phrase($arr_command)); //se não for retwitte, apenas responde
+		}
 	}
 	
 	/*---------- LOOPING - Responde os tweets ----------*/
@@ -197,7 +230,8 @@
 		global $last_id;
 		$last_id = $tweet_id; //redefine $last_id a cada iteração para que o valor final seja o do último
 		$tweet_phrase = $tweet->text;
-		define_action_on_twitter($tweet_id, $tweet_phrase);
+		$tweet_author_id = $tweet->in_reply_to_user_id;
+		define_action_on_twitter($tweet_id, $tweet_phrase, $tweet_author_id);
 		echo 'Este túite '.$tweet_id.' foi respondido. <br/>'; //precisa disso?
 	}
 	set_last_id($last_id);
