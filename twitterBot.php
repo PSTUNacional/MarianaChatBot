@@ -35,7 +35,7 @@
 	function trim_articles($phrase){
 		$articles = array("o", "os", "a", "as", "um", "uns", "uma", "umas");
 		$phrase_words = explode(" ",$phrase);
-		$new_phrase = implode(array_diff($phrase_words, $articles);
+		$new_phrase = implode(array_diff($phrase_words, $articles));
 		return $new_phrase;
 	}
 	
@@ -52,8 +52,8 @@
 	}
 	
 	function choose_phrase($arr_phrases){
-		$statement = array_rand($phrases);
-		return quoted_printable_decode($phrases[$statement]);
+		$statement = array_rand($arr_phrases);
+		return quoted_printable_decode($arr_phrases[$statement]);
 	}
 	
 	function find_first_command($tweet){
