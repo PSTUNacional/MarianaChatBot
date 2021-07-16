@@ -1,4 +1,6 @@
 <?php
+
+	
 	require_once( 'config.php' );
 	require_once( 'TwitterAPIExchange.php' );
 	
@@ -10,6 +12,12 @@
 		'consumer_secret' => TWITTER_CONSUMER_SECRET,
 	);
 	
+
+	/*---------- Até aqui é só conexão, talvez nao precise. ----------*/
+
+
+
+
 	
 	/*---------- FAZ O LIKE ----------*/
 	$url = 'https://api.twitter.com/1.1/favorites/create.json';
