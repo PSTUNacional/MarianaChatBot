@@ -52,7 +52,6 @@
 				$twitter->setGetfield($apiData);
 				break;
 		}
-		$twitter->setPostfields($apiData);
 		$twitter->buildOauth($url, $requestMethod);
 		$response = $twitter->performRequest(true, array (CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_SSL_VERIFYPEER => 0));
 		return $response;
@@ -79,7 +78,7 @@
 	/*---------- FUNÇÕES INTERPRETATIVAS - Busca no texto palavras-chave para condicionar a resposta  ----------*/
 	function stripAccents($str) {
 		return strtr(utf8_decode($str), utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
-	}ur
+	}
 	
 	function trim_articles($phrase){
 		$articles = array("o", "os", "a", "as", "um", "uns", "uma", "umas");
@@ -183,10 +182,11 @@
 		}
 	}
 	
-	function define_action_on_twitter($tweet_id, $twitter_phrase){
+	function define_action_on_twitter($tweet_id, $tweet_phrase){
 		$arr_command = find_first_command($tweet_phrase);
 		if(is_null($arr_command)){return send_like($tweet_id);} //sem comandos, apenas dar like
 		//apenas temos comandos de responder por enquanto
+		send_like($tweet_id);
 		send_response($tweet_id, command_phrase($arr_command));
 	}
 	
