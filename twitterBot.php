@@ -44,6 +44,14 @@
 	function send_to_twitter_API($url, $requestMethod, $apiData){
 		global $settings;
 		$twitter = new TwitterAPIExchange($settings);
+		switch ($requestMethod){
+			case "POST":
+				$twitter->setPostfields($apiData);
+				break;
+			case "GET":
+				$twitter->setGetfield($apiData);
+				break;
+		}
 		$twitter->setPostfields($apiData);
 		$twitter->buildOauth($url, $requestMethod);
 		$response = $twitter->performRequest(true, array (CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_SSL_VERIFYPEER => 0));
