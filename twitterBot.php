@@ -33,7 +33,7 @@
 	}
 	
 	function trim_articles($phrase){
-		$articles = array("o", "os", "a", "as");
+		$articles = array("o", "os", "a", "as", "um", "uns", "uma", "umas");
 		$phrase_words = explode(" ",$phrase);
 		$new_phrase = implode(array_diff($phrase_words, $articles);
 		return $new_phrase;
