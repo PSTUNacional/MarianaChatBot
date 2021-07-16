@@ -59,7 +59,6 @@
 	function find_first_command($tweet){
 		$tweet = normalize_tweet($tweet);
 		$key_commands = array(
-			"#pesquisa" => array("#pesquisa", " pensa sobre ", " defende sobre ", " posicao sobre ", " algo sobre ", " do pstu sobre ", " no pstu sobre "),
 			"#editorial" => array("#editorial", "editorial"),
 			"#jornal" => array("#jornal", "jornal", "opiniao socialista", "opinião socialista"),
 			"#filiar" => array("#filiar", "filiar", "filia", "filiação", "filie"),
@@ -69,7 +68,8 @@
 			"#serieTrotsky" => array("#serieTrotsky", "serie tr", "serie do tr", "serie sobre tr"),
 			"#formacao" => array("#formacao", "formacao", "formação", "clássicos", "classico", "estudar", "estudo"),
 			"#orientacao" => array("#orientacao", "orientacao marxita", "orientação marxista", "canal do gustavo", "gustavo machado"),
-			"#socialismo" => array("#socialismo", "socialismo", "socialista", "comunismo", "comunista", "anti-capitalismo", "anti-capitalista", "capitalismo", "capitalista")
+			"#socialismo" => array("#socialismo", "socialismo", "socialista", "comunismo", "comunista", "anti-capitalismo", "anti-capitalista", "capitalismo", "capitalista"),
+			"#pesquisa" => array("#pesquisa", " sobre ")
 		);
 		foreach ($key_commands as $normalized_command => $possible_commands){
 			foreach($possible_commands as $command){
