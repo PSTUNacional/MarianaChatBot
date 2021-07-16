@@ -186,7 +186,6 @@
 		$arr_command = find_first_command($tweet_phrase);
 		if(is_null($arr_command)){return send_like($tweet_id);} //sem comandos, apenas dar like
 		//apenas temos comandos de responder por enquanto
-		send_like($tweet_id);
 		send_response($tweet_id, command_phrase($arr_command));
 	}
 	
