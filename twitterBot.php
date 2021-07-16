@@ -195,7 +195,8 @@
 	$last_id = 0;
 	foreach ($tweet_list as $tweet){
 		$tweet_id = $tweet->id;
-		global $last_id = $tweet_id; //redefine $last_id a cada iteração para que o valor final seja o do último
+		global $last_id;
+		$last_id = $tweet_id; //redefine $last_id a cada iteração para que o valor final seja o do último
 		$tweet_phrase = $tweet->text;
 		define_action_on_twitter($tweet_id, $tweet_phrase);
 		echo 'Este túite '.$tweet_id.' foi respondido. <br/>'; //precisa disso?
