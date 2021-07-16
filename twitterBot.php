@@ -184,7 +184,6 @@
 	}
 	
 	/*---------- LOOPING - Responde os tweets ----------*/
-	$lista[0]->id
 	$tweet_list = last_mentions(get_last_id());
 	$last_id = 0;
 	foreach ($tweet_list as $tweet){
