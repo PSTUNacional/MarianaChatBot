@@ -58,6 +58,7 @@
 			$last_id = fgets($file);
 		}
 		fclose($file);
+		return $last_id;
 	}
 	
 	function set_last_id($last_id){
