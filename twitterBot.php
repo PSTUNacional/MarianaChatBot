@@ -14,10 +14,7 @@
 		$url = 'https://api.twitter.com/1.1/statuses/mentions_timeline.json';
 		$requestMethod = 'GET';
 		$apiData = '?since_id='.$last_id;
-		$twitter = new TwitterAPIExchange( $settings );
-		$twitter->setGetfield( $apiData );   
-		$twitter->buildOauth( $url, $requestMethod );
-		$response = $twitter->performRequest(true, array (CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_SSL_VERIFYPEER => 0));
+		$response = send_to_twitter_API($url, $requestMethod, $apiData);
 		$lista = json_decode($response);
 		return $lista;
 	}
@@ -45,10 +42,12 @@
 	}
 	
 	function send_to_twitter_API($url, $requestMethod, $apiData){
+		global $settings;
 		$twitter = new TwitterAPIExchange($settings);
 		$twitter->setPostfields($apiData);
-		$twitter->buildOauth($urlAnswer, $requestMethod);
+		$twitter->buildOauth($url, $requestMethod);
 		$response = $twitter->performRequest(true, array (CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_SSL_VERIFYPEER => 0));
+		return $response;
 	}
 	
 	/*---------- Funções de registro ----------*/
@@ -72,7 +71,7 @@
 	/*---------- FUNÇÕES INTERPRETATIVAS - Busca no texto palavras-chave para condicionar a resposta  ----------*/
 	function stripAccents($str) {
 		return strtr(utf8_decode($str), utf8_decode('àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ'), 'aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY');
-	}
+	}ur
 	
 	function trim_articles($phrase){
 		$articles = array("o", "os", "a", "as", "um", "uns", "uma", "umas");
