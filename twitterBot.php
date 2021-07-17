@@ -87,7 +87,7 @@
 	}
 	
 	function set_last_id($last_id){
-		if($last_id !== NULL){	
+		if($last_id !== NULL AND $last_id !== 0){	
 			$fp = fopen('last_id.txt', 'w');
 			fwrite ($fp, $last_id);
 			fclose($fp);
