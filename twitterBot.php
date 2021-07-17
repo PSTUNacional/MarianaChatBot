@@ -175,15 +175,19 @@
 	}
 	
 	function trim_punctuation($phrase){
-		return str_replace(array("?","!",",",";","."), "", $phrase);
+		return str_replace(array("?","!",",",";","."), " ", $phrase);
 	}
-	
+
+	function trim_extra_spaces($phrase){
+		return trim(preg_replace('/\s\s+/', ' ', str_replace("\n", " ", $phrase)));
+	}
+
 	function normalize_url_param_value($value){
 		return rawurlencode(trim_punctuation(trim_articles($value)));
 	}
 	
 	function normalize_tweet($tweet){
-		return stripAccents(mb_strtolower($tweet, 'UTF-8'));
+		return trim_extra_spaces(stripAccents(mb_strtolower($tweet, mb_detect_encoding($tweet))));
 	}
 	
 	function choose_phrase($arr_phrases){
