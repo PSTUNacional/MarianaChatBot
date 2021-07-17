@@ -224,14 +224,11 @@
 	
 	/*---------- LOOPING - Responde os tweets ----------*/
 	$tweet_list = last_mentions(get_last_id());
-	$last_id = 0;
 	foreach ($tweet_list as $tweet){
 		$tweet_id = $tweet->id;
-		global $last_id;
-		$last_id = $tweet_id; //redefine $last_id a cada iteração para que o valor final seja o do último
 		$tweet_phrase = $tweet->text;
 		$tweet_author_id = $tweet->in_reply_to_user_id;
 		define_action_on_twitter($tweet_id, $tweet_phrase, $tweet_author_id);
 		echo 'Este túite '.$tweet_id.' foi respondido. <br/>'; //precisa disso?
 	}
-	set_last_id($last_id);
+	set_last_id($tweet_list[0]->id);
