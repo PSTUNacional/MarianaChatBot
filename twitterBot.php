@@ -231,4 +231,3 @@
 		define_action_on_twitter($tweet_id, $tweet_phrase, $tweet_author_id);
 		echo 'Este túite '.$tweet_id.' foi respondido. <br/>'; //precisa disso?
 	}
-	//set_last_id($tweet_list[0]->id);
