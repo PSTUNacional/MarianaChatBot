@@ -282,7 +282,9 @@
 			if($friends == []){get_friends();} //verifica se a lista de amigos está vazia, se tiver, cria.
 			if(in_array($tweet_author_id, $friends)){ //verifica se esse twitte está na lista de amigos
 				$response = send_retweet($tweet_id, $response_phrase); //se tiver, retwitta e salva o last_id
-				set_last_id($response->id);
+				$retweet_status = $response->retweeted_status;
+				$retweet_id = $retweet_status->id;
+				set_last_id($retweet_id);
 				return;
 			}else{
 				return send_like($tweet_id); //se não tiver na lista de amigos, apenas dá like
