@@ -87,10 +87,12 @@
 	}
 	
 	function set_last_id($last_id){
-		if($last_id !== NULL AND $last_id !== 0){	
+		if($last_id !== NULL AND $last_id !== 0){
+			echo "ultimo last_id para salvar: ".$last_id;
 			$fp = fopen('last_id.txt', 'w');
 			fwrite ($fp, $last_id);
 			fclose($fp);
+			echo "ultimo last_id salvo: ".get_last_id();
 		}
 	}
 
@@ -279,9 +281,9 @@
 			global $friends;
 			if($friends == []){get_friends();} //verifica se a lista de amigos está vazia, se tiver, cria.
 			if(in_array($tweet_author_id, $friends)){ //verifica se esse twitte está na lista de amigos
-				$tweet = send_retweet($tweet_id, $response_phrase); //se tiver, retwitta e salva o last_id
-				echo "id retweet: ".$tweet->id;
-				set_last_id($tweet->id);
+				$new_tweet = send_retweet($tweet_id, $response_phrase); //se tiver, retwitta e salva o last_id
+				echo "id retweet: ".$new_tweet->id;
+				set_last_id($new_tweet->id);
 				return;
 			}else{
 				return send_like($tweet_id); //se não tiver na lista de amigos, apenas dá like
