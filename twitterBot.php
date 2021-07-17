@@ -277,8 +277,8 @@
 		$commands_to_retweet = array("#denuncia", "#urgente", "#liberdade");
 		if (in_array($arr_command["command"], $commands_to_retweet)) { //verifica se é um comando retweet 
 			global $friends;
-			if($friends == []){get_friends(); echo $friends;} //verifica se a lista de amigos está vazia, se tiver, cria.
-			if(in_array($tweet_author_id, $friends)){ //verifica se esse twitte está na lista de amigos
+			if($friends == []){get_friends();} //verifica se a lista de amigos está vazia, se tiver, cria.
+			if(in_array(strval($tweet_author_id), $friends)){ //verifica se esse twitte está na lista de amigos
 				$new_tweet = send_retweet($tweet_id, $response_phrase); //se tiver, retwitta e salva o last_id
 				set_last_id($new_tweet->id);
 				return;
