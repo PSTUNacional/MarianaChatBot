@@ -278,9 +278,7 @@
 		if (in_array($arr_command["command"], $commands_to_retweet)) { //verifica se é um comando retweet 
 			global $friends;
 			if($friends == []){get_friends();} //verifica se a lista de amigos está vazia, se tiver, cria.
-			echo "antes do if: ".$tweet_author_id."<br>"
 			if(in_array(strval($tweet_author_id), $friends)){ //verifica se esse twitte está na lista de amigos
-				echo "depois do if: ".$tweet_author_id."<br>"
 				$new_tweet = send_retweet($tweet_id, $response_phrase); //se tiver, retwitta e salva o last_id
 				set_last_id($new_tweet->id);
 				return;
@@ -298,7 +296,7 @@
 	foreach ($tweet_list as $tweet){
 		$tweet_id = $tweet->id;
 		$tweet_phrase = $tweet->text;
-		$tweet_author_id = $tweet->in_reply_to_user_id;
+		$tweet_author_id = $tweet->user->id;
 		define_action_on_twitter($tweet_id, $tweet_phrase, $tweet_author_id);
 		echo 'Este túite '.$tweet_id.' foi respondido. <br/>'; //precisa disso?
 	}
