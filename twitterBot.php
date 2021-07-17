@@ -89,7 +89,7 @@
 	}
 	
 	function set_last_id($last_id){
-		if($last_id !== NULL){	
+		if($last_id !== NULL AND $last_id !== 0){	
 			$fp = fopen('last_id.txt', 'w');
 			fwrite ($fp, $last_id);
 			fclose($fp);
@@ -228,8 +228,8 @@
 	
 	/*---------- LOOPING - Responde os tweets ----------*/
 	$tweet_list = last_mentions(get_last_id());
-	set_last_id($tweet_list[0]->id);
-	foreach ($tweet_list as $tweet){
+  set_last_id($tweet_list[0]->id);
+  foreach ($tweet_list as $tweet){
 		$tweet_id = $tweet->id;
 		$tweet_phrase = $tweet->text;
 		$tweet_author_id = $tweet->in_reply_to_user_id;
