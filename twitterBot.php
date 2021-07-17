@@ -31,7 +31,7 @@
 	}
 	
 	function send_response($tweet_id, $response_phrase){
-		send_to_twitter_API(
+		$response = send_to_twitter_API(
 			'https://api.twitter.com/1.1/statuses/update.json',
 			'POST',
 			array(
@@ -40,14 +40,16 @@
 				'in_reply_to_status_id' => $tweet_id,
 			)
 		);
+		return $response;
 	}
 
 	function send_retweet($tweet_id, $response_phrase){
-		send_to_twitter_API(
+		$response = send_to_twitter_API(
 			'https://api.twitter.com/1.1/statuses/retweet/'.$tweet_id.'.json',
 			'POST',
 			array()
 		);
+		return $response;
 	}
 	
 	function send_like($tweet_id){
@@ -213,9 +215,11 @@
 			global $friends;
 			if($friends == []){get_friends();} //verifica se a lista de amigos está vazia, se tiver, cria.
 			if(in_array($tweet_author_id, $friends)){ //verifica se esse twitte está na lista de amigos
-				return send_retweet($tweet_id, $response_phrase); //se tiver, retwitta
+				$response = send_retweet($tweet_id, $response_phrase); //se tiver, retwitta e salva o last_id
+				set_last_id($response->id);
+				return;
 			}else{
-				return send_like($tweet_id); //se não tiver, apenas dá like
+				return send_like($tweet_id); //se não tiver na lista de amigos, apenas dá like
 			}
 		}else{
 			send_response($tweet_id, command_phrase($arr_command)); //se não for retwitte, apenas responde
@@ -224,7 +228,8 @@
 	
 	/*---------- LOOPING - Responde os tweets ----------*/
 	$tweet_list = last_mentions(get_last_id());
-	foreach ($tweet_list as $tweet){
+  set_last_id($tweet_list[0]->id);
+  foreach ($tweet_list as $tweet){
 		$tweet_id = $tweet->id;
 		$tweet_phrase = $tweet->text;
 		$tweet_author_id = $tweet->in_reply_to_user_id;
