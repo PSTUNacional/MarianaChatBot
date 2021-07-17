@@ -15,8 +15,7 @@
 		$url = 'https://api.twitter.com/1.1/statuses/mentions_timeline.json';
 		$requestMethod = 'GET';
 		$apiData = '?since_id='.$last_id;
-		$response = send_to_twitter_API($url, $requestMethod, $apiData);
-		$lista = json_decode($response);
+		$lista = send_to_twitter_API($url, $requestMethod, $apiData);
 		return $lista;
 	}
 	
@@ -24,8 +23,7 @@
 		$url = 'https://api.twitter.com/1.1/friends/ids.json';
 		$requestMethod = 'GET';
 		$apiData = "";
-		$response = send_to_twitter_API($url, $requestMethod, $apiData);
-		$lista = json_decode($response);
+		$lista = send_to_twitter_API($url, $requestMethod, $apiData);
 		global $friends;
 		$friends = $lista->ids;
 	}
@@ -75,7 +73,7 @@
 		}
 		$twitter->buildOauth($url, $requestMethod);
 		$response = $twitter->performRequest(true, array (CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_SSL_VERIFYPEER => 0));
-		return $response;
+		return json_decode($response);
 	}
 	
 	/*---------- Funções de registro ----------*/
@@ -281,9 +279,9 @@
 			global $friends;
 			if($friends == []){get_friends();} //verifica se a lista de amigos está vazia, se tiver, cria.
 			if(in_array($tweet_author_id, $friends)){ //verifica se esse twitte está na lista de amigos
-				$response = send_retweet($tweet_id, $response_phrase); //se tiver, retwitta e salva o last_id
-				echo "id retweet: ".$response->id;
-				set_last_id($response->id);
+				$tweet = send_retweet($tweet_id, $response_phrase); //se tiver, retwitta e salva o last_id
+				echo "id retweet: ".$tweet->id;
+				set_last_id($tweet->id);
 				return;
 			}else{
 				return send_like($tweet_id); //se não tiver na lista de amigos, apenas dá like
@@ -295,8 +293,8 @@
 	
 	/*---------- LOOPING - Responde os tweets ----------*/
 	$tweet_list = last_mentions(get_last_id());
-  set_last_id($tweet_list[0]->id);
-  foreach ($tweet_list as $tweet){
+	set_last_id($tweet_list[0]->id);
+	foreach ($tweet_list as $tweet){
 		$tweet_id = $tweet->id;
 		$tweet_phrase = $tweet->text;
 		$tweet_author_id = $tweet->in_reply_to_user_id;
