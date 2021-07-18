@@ -78,7 +78,10 @@
 	
 	/*---------- Funções de registro ----------*/
 	function get_last_id(){
-		$file = fopen("last_id.txt", "r");
+		$file = false
+		while($file == false){
+			$file = fopen("last_id.txt", "r");
+		}
 		while(! feof($file)) {
 			$last_id = fgets($file);
 		}
