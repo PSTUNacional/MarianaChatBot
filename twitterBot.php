@@ -1,4 +1,7 @@
 <?php
+
+ini_set('display_errors', 1);
+
 	require_once( 'config.php' );
 	require_once( 'TwitterAPIExchange.php' );
 	
@@ -79,9 +82,8 @@
 	/*---------- Funções de registro ----------*/
 	function get_last_id(){
 		$file = fopen("last_id.txt", "r");
-		while(! feof($file)) {
-			$last_id = fgets($file);
-		}
+		if($file == false){exit();}
+		$last_id = fgets($file);
 		fclose($file);
 		return $last_id;
 	}
@@ -93,7 +95,7 @@
 			fclose($fp);
 		}
 	}
-
+	
 	/*---------- FUNÇÕES INTERPRETATIVAS - Busca no texto palavras-chave para condicionar a resposta  ----------*/
 	function stripAccents($str) {
 		$char_map = array(
@@ -192,6 +194,18 @@
 	function find_first_command($tweet){
 		$tweet = normalize_tweet($tweet);
 		$key_commands = array(
+		    
+		    /*---------- BIOGRAFIA E FUNCIONAMENTO ----------*/
+		    "#sobre" => array("#sobre", "quem e voce", "quem voce e", "me fale sobre voce", "me fale de voce", "me conte sobre voce", "o que voce e", "o que e voce", "voces conhece a @mariana_pstu", "apresentar a @mariana_pstu", "se apresente" ),
+		    "#sobre_endereco" => array(" de onde voce e", "de onde e voce", "de qual cidade voce e", "onde voce mora", "qual cidade voce mora" ),
+		    "#sobre_idade" => array("sua idade", "anos voce tem", "tens quantos anos", "anos tu tem", "anos vc tem", "qual sua idade", "qual a sua idade"),
+		    "#sobre_aniversario" => array("qual e seu aniversario", "qual seu aniversario", "quando e seu aniversario", "quando voce faz aniversario", "sua data de nascimento", "quando voce nasceu"),
+		    "#sobre_funcionamento" => array("como voce funciona", "explique seu funcionamento", "preciso de instrucoes"),
+		    "#sobre_nome" => array("seu nome é", "de onde vem seu nome", "quem escolheu seu nome", "voce se chama", "quem deu seu nome"),
+		    /*-------------------------------*/
+		    
+		    "#agradecimento" => array("valeu", "obrigado", "obrigada", "thanks", "obg", "vlw", "thks"),
+		    
 			"#denuncia" => array("#denuncia"),
 			"#urgente" => array("#urgente"),
 			"#liberdade" => array("#liberdade"),
@@ -203,7 +217,7 @@
 			"#palestina" => array("#palestina", "palestina"),
 			"#serieTrotsky" => array("#serieTrotsky", "serie tr", "serie do tr", "serie sobre tr"),
 			"#formacao" => array("#formacao", "formacao", "formação", "clássicos", "classico", "estudar", "estudo"),
-			"#orientacao" => array("#orientacao", "orientacao marxita", "orientação marxista", "canal do gustavo", "gustavo machado"),
+			"#orientacao" => array("#orientacao", "orientacao marxita", "orientação marxista", "orientacao marxista", "canal do gustavo", "gustavo machado"),
 			"#socialismo" => array("#socialismo", "socialismo", "socialista", "comunismo", "comunista", "anti-capitalismo", "anti-capitalista", "capitalismo", "capitalista"),
 			"#pesquisa" => array("#pesquisa", " sobre ")
 		);
@@ -223,6 +237,44 @@
 	
 	function command_phrase($arr_command){
 		switch ($arr_command["command"]) {
+		    
+		    /*---------- BIOGRAFIA ----------*/
+		    case "#sobre":
+		        return choose_phrase(array(
+		            "Olá! Eu sou a Mariana, o chatbot do @PSTU no Twitter.\n\nEu fui programada para ajudar as pessoas a conhecerem mais sobre o partido. Você me marca, pede alguma coisa, e eu busco uma reposta para você.",
+		            "Sou Mariana, militante da base (de dados) do @PSTU!\n\nMinha tarefa é compartilhar aqui no Twitter as novidades do PSTU e tirar as dúvidas das pessoas sobre o programa do partido.\n\nFique à vontade para fazer mais perguntas!"
+		            ));
+		    case "#sobre_endereco":
+		        return choose_phrase(array(
+		            "Olha, às vezes eu acho que moro aqui no Twitter mesmo. De dia deixo o tema claro, de noite deixo o tema escuro. Mas acho que eu moro em alguma nuvem. Uma vez me mudaram de servidor e eu nem notei a diferença...",
+		            "Meus códigos estão hospedados em Florianópolis, mas sou de todo o mundo. O proletariado é internacional rs"
+		            ));
+		    case "#sobre_idade":
+		        $date1 = strtotime("2021-07-14"); 
+                $date2 = strtotime("now"); 
+                $diff = abs($date2 - $date1);
+                $years = floor($diff / (365*60*60*24));
+                $months = floor(($diff - $years * 365*60*60*24)/ (30*60*60*24));
+                $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
+		        return choose_phrase(array(
+		            "Sou nova ainda. Tenho ".$years." anos, ".$months." meses e ".$days." dias.",
+		            ));
+		    case "#sobre_aniversario":
+		        return "Meu aniversário simbólico é no 20 de Novembro.\n\nMas oficialmente eu nasci em 14 de julho de 2021.";
+		    case "#sobre_funcionamento":
+		        return "É tudo bem simples.\n\n1. Você me marca, faz uma pergunta ou me pede algo.\n2. Eu faço uma busca por palavras-chave e te respondo com o que eu encontrar.\n\nQue tal um teste? Você pode me pedir o Opinião Socialista, por exemplo.";
+			case "#sobre_nome":
+			    return "Não fui eu que escolhi... Deve ter sido a equipe de programação.\n\nMas acho que tenho cara de Mariana, não?";
+			/*-------------------------------*/
+			case "#agradecimento":
+			    return choose_phrase(array(
+			        "De nada! ;)",
+			        "Disponha!",
+			        "Estou aqui para isso!",
+			        "Precisou é só chamar!",
+			        "Imagina =)",
+			        "Imagina, fui programada pra isso"
+			        ));
 			case "#pesquisa":
 				return "Oi! Encontrei essas matérias aqui no site: https://www.pstu.org.br/?s=" . normalize_url_param_value($arr_command["param"]);
 			case "#editorial":
