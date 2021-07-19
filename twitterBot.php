@@ -201,7 +201,7 @@ ini_set('display_errors', 1);
 			"#sobre_idade" => array("sua idade", "anos voce tem", "tens quantos anos", "anos tu tem", "anos vc tem", "qual sua idade", "qual a sua idade"),
 		  	"#sobre_aniversario" => array("qual e seu aniversario", "qual seu aniversario", "quando e seu aniversario", "quando voce faz aniversario", "sua data de nascimento", "quando voce nasceu"),
 		   	"#sobre_funcionamento" => array("como voce funciona", "explique seu funcionamento", "preciso de instrucoes"),
-		   	"#sobre_nome" => array("seu nome e", "de onde vem seu nome", "quem escolheu seu nome", "voce se chama", "quem deu seu nome"),
+		   	"#sobre_nome" => array("seu nome"),
 		  	/*-------------------------------*/
 		    
 		   	"#agradecimento" => array("valeu", "obrigado", "obrigada", "thanks", "obg", "vlw", "thks"),
