@@ -195,16 +195,16 @@ ini_set('display_errors', 1);
 		$tweet = normalize_tweet($tweet);
 		$key_commands = array(
 		    
-		    /*---------- BIOGRAFIA E FUNCIONAMENTO ----------*/
-		    "#sobre" => array("#sobre", "quem e voce", "quem voce e", "me fale sobre voce", "me fale de voce", "me conte sobre voce", "o que voce e", "o que e voce", "voces conhece a @mariana_pstu", "apresentar a @mariana_pstu", "se apresente" ),
-		    "#sobre_endereco" => array(" de onde voce e", "de onde e voce", "de qual cidade voce e", "onde voce mora", "qual cidade voce mora" ),
-		    "#sobre_idade" => array("sua idade", "anos voce tem", "tens quantos anos", "anos tu tem", "anos vc tem", "qual sua idade", "qual a sua idade"),
-		    "#sobre_aniversario" => array("qual e seu aniversario", "qual seu aniversario", "quando e seu aniversario", "quando voce faz aniversario", "sua data de nascimento", "quando voce nasceu"),
-		    "#sobre_funcionamento" => array("como voce funciona", "explique seu funcionamento", "preciso de instrucoes"),
-		    "#sobre_nome" => array("seu nome é", "de onde vem seu nome", "quem escolheu seu nome", "voce se chama", "quem deu seu nome"),
-		    /*-------------------------------*/
+			/*---------- BIOGRAFIA E FUNCIONAMENTO ----------*/
+			"#sobre" => array("#sobre", "quem e voce", "quem voce e", "me fale sobre voce", "me fale de voce", "me conte sobre voce", "o que voce e", "o que e voce", "voces conhece a @mariana_pstu", "apresentar a @mariana_pstu", "se apresente" ),
+			"#sobre_endereco" => array(" de onde voce e", "de onde e voce", "de qual cidade voce e", "onde voce mora", "qual cidade voce mora" ),
+			"#sobre_idade" => array("sua idade", "anos voce tem", "tens quantos anos", "anos tu tem", "anos vc tem", "qual sua idade", "qual a sua idade"),
+		  	"#sobre_aniversario" => array("qual e seu aniversario", "qual seu aniversario", "quando e seu aniversario", "quando voce faz aniversario", "sua data de nascimento", "quando voce nasceu"),
+		   	"#sobre_funcionamento" => array("como voce funciona", "explique seu funcionamento", "preciso de instrucoes"),
+		   	"#sobre_nome" => array("seu nome é", "de onde vem seu nome", "quem escolheu seu nome", "voce se chama", "quem deu seu nome"),
+		  	/*-------------------------------*/
 		    
-		    "#agradecimento" => array("valeu", "obrigado", "obrigada", "thanks", "obg", "vlw", "thks"),
+		   	"#agradecimento" => array("valeu", "obrigado", "obrigada", "thanks", "obg", "vlw", "thks"),
 		    
 			"#denuncia" => array("#denuncia"),
 			"#urgente" => array("#urgente"),
@@ -256,15 +256,15 @@ ini_set('display_errors', 1);
                 $years = floor($diff / (365*60*60*24));
                 $months = floor(($diff - $years * 365*60*60*24)/ (30*60*60*24));
                 $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
-		        return choose_phrase(array(
-		            "Sou nova ainda. Tenho ".$years." anos, ".$months." meses e ".$days." dias.",
-		            ));
-		    case "#sobre_aniversario":
-		        return "Meu aniversário simbólico é no 20 de Novembro.\n\nMas oficialmente eu nasci em 14 de julho de 2021.";
-		    case "#sobre_funcionamento":
-		        return "É tudo bem simples.\n\n1. Você me marca, faz uma pergunta ou me pede algo.\n2. Eu faço uma busca por palavras-chave e te respondo com o que eu encontrar.\n\nQue tal um teste? Você pode me pedir o Opinião Socialista, por exemplo.";
+				return choose_phrase(array(
+		          		"Sou nova ainda. Tenho ".$years." anos, ".$months." meses e ".$days." dias.",
+		            	));
+			case "#sobre_aniversario":
+		       		return "Meu aniversário simbólico é no 20 de Novembro.\n\nMas oficialmente eu nasci em 14 de julho de 2021.";
+			case "#sobre_funcionamento":
+		        	return "É tudo bem simples.\n\n1. Você me marca, faz uma pergunta ou me pede algo.\n2. Eu faço uma busca por palavras-chave e te respondo com o que eu encontrar.\n\nQue tal um teste? Você pode me pedir o Opinião Socialista, por exemplo.";
 			case "#sobre_nome":
-			    return "Não fui eu que escolhi... Deve ter sido a equipe de programação.\n\nMas acho que tenho cara de Mariana, não?";
+				return "Não fui eu que escolhi... Deve ter sido a equipe de programação.\n\nMas acho que tenho cara de Mariana, não?";
 			/*-------------------------------*/
 			case "#agradecimento":
 			    return choose_phrase(array(
