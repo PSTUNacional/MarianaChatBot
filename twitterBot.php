@@ -4,9 +4,11 @@ ini_set('display_errors', 1);
 
 	require_once( 'config.php' );
 	require_once( 'TwitterAPIExchange.php' );
+	include_once('trotsky_frases.php');
 	
 	/*---------- Funções de comando do twitter ----------*/
 	$friends = [];
+	$img_id = '';
 	$settings = array(
 		'oauth_access_token' => TWITTER_ACCESS_TOKEN, 
 		'oauth_access_token_secret' => TWITTER_ACCESS_TOKEN_SECRET, 
@@ -32,6 +34,7 @@ ini_set('display_errors', 1);
 	}
 	
 	function send_response($tweet_id, $response_phrase){
+	    global $img_id;
 		$response = send_to_twitter_API(
 			'https://api.twitter.com/1.1/statuses/update.json',
 			'POST',
@@ -39,6 +42,7 @@ ini_set('display_errors', 1);
 				'status' => $response_phrase,
 				'auto_populate_reply_metadata' => 'true',
 				'in_reply_to_status_id' => $tweet_id,
+				'media_ids' => $img_id,
 			)
 		);
 		return $response;
@@ -195,16 +199,32 @@ ini_set('display_errors', 1);
 		$tweet = normalize_tweet($tweet);
 		$key_commands = array(
 		    
-			/*---------- BIOGRAFIA E FUNCIONAMENTO ----------*/
-			"#sobre" => array("#sobre", "quem e voce", "quem voce e", "me fale sobre voce", "me fale de voce", "me conte sobre voce", "o que voce e", "o que e voce", "voces conhece a @mariana_pstu", "apresentar a @mariana_pstu", "se apresente" ),
-			"#sobre_endereco" => array(" de onde voce e", "de onde e voce", "de qual cidade voce e", "onde voce mora", "qual cidade voce mora" ),
-			"#sobre_idade" => array("sua idade", "anos voce tem", "tens quantos anos", "anos tu tem", "anos vc tem", "qual sua idade", "qual a sua idade"),
-		  	"#sobre_aniversario" => array("qual e seu aniversario", "qual seu aniversario", "quando e seu aniversario", "quando voce faz aniversario", "sua data de nascimento", "quando voce nasceu"),
-		   	"#sobre_funcionamento" => array("como voce funciona", "explique seu funcionamento", "preciso de instrucoes"),
-		   	"#sobre_nome" => array("seu nome"),
-		  	/*-------------------------------*/
+		    /*---------- BIOGRAFIA E FUNCIONAMENTO ----------*/
+		    "#sobre" => array("#sobre", "quem e voce", "quem voce e", "me fale sobre voce", "me fale de voce", "me conte sobre voce", "o que voce e", "o que e voce", "voces conhecem a @mariana_pstu", "apresentar a @mariana_pstu", "se apresente", "apresentar para voces" ),
+		    "#sobre_endereco" => array(" de onde voce e", "de onde e voce", "de qual cidade voce e", "onde voce mora", "qual cidade voce mora" ),
+		    "#sobre_idade" => array("sua idade", "anos voce tem", "tens quantos anos", "anos tu tem", "anos vc tem", "qual sua idade", "qual a sua idade"),
+		    "#sobre_aniversario" => array("qual e seu aniversario", "qual seu aniversario", "quando e seu aniversario", "quando voce faz aniversario", "sua data de nascimento", "quando voce nasceu"),
+		    "#sobre_funcionamento" => array("como voce funciona", "explique seu funcionamento", "preciso de instrucoes"),
+		    "#sobre_nome" => array("seu nome"),
+		    /*-------------------------------*/
 		    
-		   	"#agradecimento" => array("valeu", "obrigado", "obrigada", "thanks", "obg", "vlw", "thks"),
+		    "#agradecimento" => array("valeu", "obrigado", "obrigada", "thanks", "obg", "vlw", "thks"),
+		    
+		    "#24j" => array("24j","24 de julho", "#24j"),
+		    
+		    /*---------- PARTIDO ----------*/
+		    "#partido_face" => array("facebook do pstu", "face do pstu", "facebook do partido", "face do partido", "perfil do pstu no face", "pstu tem face", "pstu no face", "partido tem face", "pstu tem face", "partido, tem face", "pstu, tem face"),
+		    "#partido_insta" => array ("insta do pstu", "insta do partido", "instagram do partido", "instagram do pstu", "ig do partido", "ig do pstu", "partido tem insta", "pstu tem insta", "partido tem ig", "pstu tem ig", "partido no insta", "pstu no insta", "partido no ig", "pstu no ig", "pstu, tem insta", "pstu,tem ig","partido, tem ig", "pstu, tem ig"),
+		    /*-------------------------------*/
+		    
+		    /*---------- TROTSKY ----------*/
+		    "#trotsky_frase" => array("frase do trot", "frase de trot", "citacao de trot", "citacao do trot"),
+		    /*-------------------------------*/
+		    
+		    /*---------- VERA ----------*/
+		    "#vera_face" => array("facebook da vera", "face da vera", "vera no face", "vera tem face"),
+		    "#vera_insta" => array ("insta da vera", "instagram da vera", "ig da vera", "vera tem insta", "vera tem ig", "vera no insta", "vera no ig", "vera, tem insta", "vera, tem ig"),
+		    /*-------------------------------*/
 		    
 			"#denuncia" => array("#denuncia"),
 			"#urgente" => array("#urgente"),
@@ -212,6 +232,7 @@ ini_set('display_errors', 1);
 			"#editorial" => array("#editorial", "editorial"),
 			"#jornal" => array("#jornal", "jornal", "opiniao socialista", "opinião socialista"),
 			"#filiar" => array("#filiar", "filiar", "filia", "filiação", "filie"),
+			"#doacao" => array("doar para o p", "doacao para o p", "contribuicao financeira", "contribuir financeira", "contribuir com voces", "contribuir com vcs", "fazer uma doacao", "faco uma doacao"),
 			"#whatsapp" => array("#whatsapp", "whatsapp", "zap", "whats"),
 			"#facebook" => array("#facebook", "facebook"),
 			"#palestina" => array("#palestina", "palestina"),
@@ -256,15 +277,15 @@ ini_set('display_errors', 1);
                 $years = floor($diff / (365*60*60*24));
                 $months = floor(($diff - $years * 365*60*60*24)/ (30*60*60*24));
                 $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
-				return choose_phrase(array(
-		          		"Sou nova ainda. Tenho ".$years." anos, ".$months." meses e ".$days." dias.",
-		            	));
-			case "#sobre_aniversario":
-		       		return "Meu aniversário simbólico é no 20 de Novembro.\n\nMas oficialmente eu nasci em 14 de julho de 2021.";
-			case "#sobre_funcionamento":
-		        	return "É tudo bem simples.\n\n1. Você me marca, faz uma pergunta ou me pede algo.\n2. Eu faço uma busca por palavras-chave e te respondo com o que eu encontrar.\n\nQue tal um teste? Você pode me pedir o Opinião Socialista, por exemplo.";
+		        return choose_phrase(array(
+		            "Sou nova ainda. Tenho ".$years." anos, ".$months." meses e ".$days." dias.",
+		            ));
+		    case "#sobre_aniversario":
+		        return "Meu aniversário simbólico é no 20 de Novembro.\n\nMas oficialmente eu nasci em 14 de julho de 2021.";
+		    case "#sobre_funcionamento":
+		        return "É tudo bem simples.\n\n1. Você me marca, faz uma pergunta ou me pede algo.\n2. Eu faço uma busca por palavras-chave e te respondo com o que eu encontrar.\n\nQue tal um teste? Você pode me pedir o Opinião Socialista, por exemplo.";
 			case "#sobre_nome":
-				return "Não fui eu que escolhi... Deve ter sido a equipe de programação.\n\nMas acho que tenho cara de Mariana, não?";
+			    return "Não fui eu que escolhi... Deve ter sido a equipe de programação.\n\nMas acho que tenho cara de Mariana, não?";
 			/*-------------------------------*/
 			case "#agradecimento":
 			    return choose_phrase(array(
@@ -275,6 +296,45 @@ ini_set('display_errors', 1);
 			        "Imagina =)",
 			        "Imagina, fui programada pra isso"
 			        ));
+			
+			case "#24j":
+			    return "Oi! Quer saber mais sobre o 24J?\n\nAqui está a lista das cidades que já tem manifestações marcadas:\nhttps://www.pstu.org.br/24j-130-cidades-ja-agendaram-atos-pelo-fora-bolsonaro-no-brasil-e-no-exterior/";
+			
+			/*---------- PARTIDO ----------*/
+		    case "#partido_face":
+		        return choose_phrase(array(
+		            "Oi! Esse é o perfil oficial do @PSTU no Facebook:\n\nhttps://www.facebook.com/pstu16",
+		            "Aí vai! Não deixa de curtir nossa página no Facebook:\n\nhttps://www.facebook.com/pstu16 ",
+		            "Olá! A página do @PSTU no Facebook é essa aqui:\n\nhttps://www.facebook.com/pstu16"
+		    ));
+		    case "#partido_insta":
+		        return choose_phrase(array(
+		            "Oi! Esse é o perfil oficial do @PSTU no Instagram:\n\nhttps://www.instagram.com/pstu_oficial",
+		            "Aí vai! Não deixa de curtir a gente lá no Insta:\n\nhttps://www.instagram.com/pstu_oficial",
+		            "Olá! O perfil oficial do @PSTU no Instagram é esse aqui:\n\nhttps://www.instagram.com/pstu_oficial"
+		    ));
+		    /*-------------------------------*/
+		    /*---------- TROTSKY ----------*/
+		    case "#trotsky_frase":
+		        $GLOBALS['img_id'] = trotsky_foto();
+		        return trotsky_frase();
+		    /*-------------------------------*/
+		    
+		    /*---------- VERA ----------*/
+		    case "#vera_face":
+		        return choose_phrase(array(
+		            "Oi! Esse é o perfil oficial do @verapstu no Facebook:\n\nhttps://www.facebook.com/verapstu",
+		            "Aí vai! Não deixa de curtir a página dela no Facebook:\n\nhttps://www.facebook.com/verapstu",
+		            "Olá! A página doa @verapstu no Facebook é essa aqui:\n\nhttps://www.facebook.com/verapstu"
+		    ));
+		    case "#vera_insta":
+		        return choose_phrase(array(
+		            "Oi! Esse é o perfil oficial da @verapstu no Instagram:\n\nhttps://www.instagram.com/vera_pstu",
+		            "Aí vai! Não deixa de curtir a página dela lá no Insta:\n\nhttps://www.instagram.com/vera_pstu",
+		            "Olá! O perfil oficial da @verapstu no Instagram é esse aqui:\n\nhttps://www.instagram.com/vera_pstu"
+		    ));
+		    /*-------------------------------*/
+		    
 			case "#pesquisa":
 				return "Oi! Encontrei essas matérias aqui no site: https://www.pstu.org.br/?s=" . normalize_url_param_value($arr_command["param"]);
 			case "#editorial":
@@ -291,6 +351,13 @@ ini_set('display_errors', 1);
 					"AAAAaaaaahhh fico feliz que você quer se filiar! Olha, só faz o cadastro nesse link e em breve alguém entrará em contato! https://bit.ly/36AXid2",
 					"Meeee pareceee. Meeee pareceee. Meeee pareceee. Que o socialismo cresce. Faz o cadastro nesse link que eu to te mandando, e alguém entra em contato com você em breve! https://bit.ly/36AXid2"
 				));
+			case "#doacao":
+			    return choose_phrase(array(
+			        "Opa! Para contribuir com o PSTU é só acessar esse link e escolher a opção que for melhor. Você pode fazer uma doação única ou doações mensais.\n\nhttps://doe.pstu.org.br/",
+			        "Oi! Para contribuir financeiramete com a gente é só acessar:\n\nhttps://doe.pstu.org.br/",
+			        "Fazer uma doação para o PSTU é bem fácil! Esse aqui é o link:\n\nhttps://doe.pstu.org.br/",
+			    ));
+			    
 			case "#whatsapp":
 				return choose_phrase(array(
 					"Oi! Para se inscrever na nossa lista é só mandar um RECEBER para\n\n(11) 9.4101-1917\n\nVocê também pode clicar aqui https://bit.ly/3wGeetd .\nNão se esqueça de salvar nosso número na sua agenda. =)"
